@@ -1,5 +1,6 @@
 <html>
 <body>
-<h2>Hello World!</h2>
+<h2>Salud Migrante - Indexer</h2>
+<p>Esta aplicación no dispone de Front End</p>
 </body>
 </html>
