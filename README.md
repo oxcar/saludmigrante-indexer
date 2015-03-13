@@ -70,7 +70,7 @@ Acepta los siguientes parametros de URL (opcionales):
 
 ### Busqueda de Copis de Change
 
-http://host:8080/indexer/api/copis/experience/{id}/learn?from=&size
+http://host:8080/indexer/api/copis/experience/{id}/change?from=&size
 
 Acepta los siguientes parametros de URL (obligatorios):
 * id: identificador del Copi Experience 
