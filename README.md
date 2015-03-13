@@ -50,7 +50,9 @@
 
 ### Busqueda de Copis de Experience
 
+```
 http://host:8080/indexer/api/copis/experience?from=&size=&query=
+```
 
 Acepta los siguientes parametros de URL (opcionales):
 * from (integer): indica desde que registro se regresan resultados. 0 por defecto, indicando que se regresa el primer registro.
@@ -59,7 +61,9 @@ Acepta los siguientes parametros de URL (opcionales):
 
 ### Busqueda de Copis de Learn
 
-http://host:8080/indexer/api/copis/experience/{id}/learn?from=&size
+```
+http://host:8080/indexer/api/copis/experience/{id}/learn?from=&size=
+```
 
 Acepta los siguientes parametros de URL (obligatorios):
 * id: identificador del Copi Experience 
@@ -70,7 +74,9 @@ Acepta los siguientes parametros de URL (opcionales):
 
 ### Busqueda de Copis de Change
 
-http://host:8080/indexer/api/copis/experience/{id}/change?from=&size
+```
+http://host:8080/indexer/api/copis/experience/{id}/change?from=&size=
+```
 
 Acepta los siguientes parametros de URL (obligatorios):
 * id: identificador del Copi Experience 
