@@ -45,7 +45,37 @@
 ```
 - Una vez empaquetado, en la carpeta **target** esta el fichero **indexer.war** que se puede instalar en el servidor de aplicaciones Tomcat.
 
+ 
+## API
 
+### Busqueda de Copis de Experience
 
+http://host:8080/indexer/api/copis/experience?from=&size=&query=
 
+Acepta los siguientes parametros de URL (opcionales):
+* from (integer): indica desde que registro se regresan resultados. 0 por defecto, indicando que se regresa el primer registro.
+* size (integer): indica el tamaño de pagina, el numero de registros a regresar. 10 por defecto.
+* query (string): cadena de texto para realizar busquedas
+
+### Busqueda de Copis de Learn
+
+http://host:8080/indexer/api/copis/experience/{id}/learn?from=&size
+
+Acepta los siguientes parametros de URL (obligatorios):
+* id: identificador del Copi Experience 
+
+Acepta los siguientes parametros de URL (opcionales):
+* from (integer): indica desde que registro se regresan resultados. 0 por defecto, indicando que se regresa el primer registro.
+* size (integer): indica el tamaño de pagina, el numero de registros a regresar. 10 por defecto.
+
+### Busqueda de Copis de Change
+
+http://host:8080/indexer/api/copis/experience/{id}/learn?from=&size
+
+Acepta los siguientes parametros de URL (obligatorios):
+* id: identificador del Copi Experience 
+
+Acepta los siguientes parametros de URL (opcionales):
+* from (integer): indica desde que registro se regresan resultados. 0 por defecto, indicando que se regresa el primer registro.
+* size (integer): indica el tamaño de pagina, el numero de registros a regresar. 10 por defecto.
 
