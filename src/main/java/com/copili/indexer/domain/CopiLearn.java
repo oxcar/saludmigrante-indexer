@@ -56,6 +56,8 @@ public class CopiLearn extends Copi implements Serializable {
         ok = ok && (type.equals(Type.LEARN));
         ok = ok && StringUtils.isNotBlank(title);
         ok = ok && CollectionUtils.isNotEmpty(authors);
+        ok = ok && StringUtils.isNotBlank(journal);
+        ok = ok && null != year;
         ok = ok && StringUtils.isNotBlank(doi);
         return ok;
     }
@@ -75,14 +77,6 @@ public class CopiLearn extends Copi implements Serializable {
 
     public List<String> getAuthors() {
         return authors;
-    }
-
-    public void setAuthors(String authors) {
-        if(StringUtils.isBlank(authors)) {
-            return;
-        }
-        String[] authorsArray = StringUtils.split(authors, ",");
-        this.authors = Arrays.asList(authorsArray);
     }
 
     public void setAuthors(List<String> authors) {

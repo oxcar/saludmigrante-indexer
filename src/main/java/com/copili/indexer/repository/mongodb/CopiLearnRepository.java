@@ -10,4 +10,6 @@ public interface CopiLearnRepository extends MongoRepository<CopiLearn, String> 
 
     List<CopiLearn> findByIndexed(Boolean indexed);
 
+    List<CopiLearn> findByIndexedIsNull();
+
 }

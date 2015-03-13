@@ -39,6 +39,7 @@ public class CopiChange extends Copi implements Serializable {
     @Override
     public boolean isValid() {
         boolean ok = super.isValid();
+        ok = ok && StringUtils.isNotBlank(url);
         ok = ok && (type.equals(Type.CHANGE));
         ok = ok && null != begin;
         ok = ok && StringUtils.isNotBlank(ongId);

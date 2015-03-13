@@ -1,9 +1,6 @@
 package com.copili.indexer.cron;
 
-import com.copili.indexer.domain.CopiChange;
-import com.copili.indexer.domain.CopiExperience;
-import com.copili.indexer.domain.CopiLearn;
-import com.copili.indexer.domain.Ong;
+import com.copili.indexer.domain.*;
 import com.copili.indexer.repository.mongodb.CopiChangeRepository;
 import com.copili.indexer.repository.mongodb.CopiExperienceRepository;
 import com.copili.indexer.repository.mongodb.CopiLearnRepository;
@@ -11,6 +8,7 @@ import com.copili.indexer.repository.mongodb.OngRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -25,6 +23,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.util.Collections;
 import java.util.List;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
@@ -68,7 +67,9 @@ public class IndexerCronJob {
         try {
 
             // Learn Copis
-            List<CopiLearn> learnCopis = copiLearnRepository.findByIndexed(false);
+            List<CopiLearn> learnCopisIndexedfalse = copiLearnRepository.findByIndexed(false);
+            List<CopiLearn> learnCopisIndexedNull = copiLearnRepository.findByIndexedIsNull();
+            List<CopiLearn> learnCopis = (List<CopiLearn>) CollectionUtils.union(learnCopisIndexedfalse, learnCopisIndexedNull);
             for (CopiLearn copi : learnCopis) {
                 if (indexCopiLearn(copi)) {
                     copi.setIndexed(true);
@@ -79,18 +80,28 @@ public class IndexerCronJob {
             // Experience Copis
             List<CopiExperience> experienceCopis = copiExperienceRepository.findByIndexed(false);
             for (CopiExperience copi : experienceCopis) {
-                if (indexCopiExperience(copi)) {
+                if (copiIsAlreadyIndexed(copi)) {
                     copi.setIndexed(true);
                     copiExperienceRepository.save(copi);
+                } else {
+                    if (indexCopiExperience(copi)) {
+                        copi.setIndexed(true);
+                        copiExperienceRepository.save(copi);
+                    }
                 }
             }
 
             // Change Copis
             List<CopiChange> changeCopis = copiChangeRepository.findByIndexed(false);
             for (CopiChange copi : changeCopis) {
-                if (indexCopiChange(copi)) {
+                if (copiIsAlreadyIndexed(copi)) {
                     copi.setIndexed(true);
                     copiChangeRepository.save(copi);
+                } else {
+                    if (indexCopiChange(copi)) {
+                        copi.setIndexed(true);
+                        copiChangeRepository.save(copi);
+                    }
                 }
             }
 
@@ -101,56 +112,41 @@ public class IndexerCronJob {
     }
 
     private boolean indexCopiLearn(CopiLearn copiLearn) throws JsonProcessingException {
-        log.info("Indexing Copi Learn");
         if (copiLearn.isValid()) {
-            String urlHash = DigestUtils.shaHex(copiLearn.getUrl());
-            if (!existIndexedCopiByUrlHash(urlHash)) {
-                copiLearn.setUrlHash(urlHash);
-                String json = mapper.writeValueAsString(copiLearn);
-                IndexResponse response = client.prepareIndex("copis", "learn").setSource(json).execute().actionGet();
-                log.info("Indexed Copi en {}/{}/{}", response.getIndex(), response.getType(), response.getId());
-            }
+            String json = mapper.writeValueAsString(copiLearn);
+            IndexResponse response = client.prepareIndex("copis", "learn").setSource(json).execute().actionGet();
+            log.info("Indexed Copi en {}/{}/{}", response.getIndex(), response.getType(), response.getId());
             return true;
         }
         return false;
     }
 
     private boolean indexCopiExperience(CopiExperience copiExperience) throws JsonProcessingException {
-        log.info("Indexing Copi Experience");
         if (copiExperience.isValid()) {
-            String urlHash = DigestUtils.shaHex(copiExperience.getUrl());
-            if (!existIndexedCopiByUrlHash(urlHash)) {
-                copiExperience.setUrlHash(urlHash);
-                String json = mapper.writeValueAsString(copiExperience);
-                IndexResponse response = client.prepareIndex("copis", "experience").setSource(json).execute().actionGet();
-                log.info("Indexed Copi en {}/{}/{}", response.getIndex(), response.getType(), response.getId());
-            }
+            String json = mapper.writeValueAsString(copiExperience);
+            IndexResponse response = client.prepareIndex("copis", "experience").setSource(json).execute().actionGet();
+            log.info("Indexed Copi en {}/{}/{}", response.getIndex(), response.getType(), response.getId());
             return true;
         }
         return false;
     }
 
     private boolean indexCopiChange(CopiChange copiChange) throws JsonProcessingException {
-        log.info("Indexing Copi Experience");
         if (copiChange.isValid()) {
-            String urlHash = DigestUtils.shaHex(copiChange.getUrl());
-            if (!existIndexedCopiByUrlHash(urlHash)) {
-                Ong ong = ongRepository.findOne(copiChange.getOngId());
-                copiChange.setOng(ong);
-                copiChange.setUrlHash(urlHash);
-                String json = mapper.writeValueAsString(copiChange);
-                IndexResponse response = client.prepareIndex("copis", "change").setSource(json).execute().actionGet();
-                log.info("Indexed Copi en {}/{}/{}", response.getIndex(), response.getType(), response.getId());
-            }
+            Ong ong = ongRepository.findOne(copiChange.getOngId());
+            copiChange.setOng(ong);
+            String json = mapper.writeValueAsString(copiChange);
+            IndexResponse response = client.prepareIndex("copis", "change").setSource(json).execute().actionGet();
+            log.info("Indexed Copi en {}/{}/{}", response.getIndex(), response.getType(), response.getId());
             return true;
         }
         return false;
     }
 
-    private boolean existIndexedCopiByUrlHash(String urlHash) {
+    private boolean copiIsAlreadyIndexed(Copi copi) {
         SearchResponse response = client.prepareSearch("copis")
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(QueryBuilders.termQuery("urlHash", urlHash.toLowerCase()))
+                .setQuery(QueryBuilders.termQuery("urlHash", copi.getUrlHash().toLowerCase()))
                 .execute().actionGet();
         return ArrayUtils.isNotEmpty(response.getHits().getHits());
     }

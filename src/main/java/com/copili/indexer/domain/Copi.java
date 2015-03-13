@@ -3,6 +3,7 @@ package com.copili.indexer.domain;
 import com.copili.indexer.domain.listener.CopiListener;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -52,7 +53,7 @@ public class Copi extends BaseDocument implements Serializable {
 
     public boolean isValid() {
         boolean ok = StringUtils.isNotBlank(text);
-        ok = ok && StringUtils.isNotBlank(url);
+        // ok = ok && StringUtils.isNotBlank(url);
         ok = ok && StringUtils.isNotBlank(state);
         ok = ok && CollectionUtils.isNotEmpty(keywords);
         return ok;
@@ -77,7 +78,12 @@ public class Copi extends BaseDocument implements Serializable {
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        if (StringUtils.isNotBlank(url)) {
+            this.url = url;
+            this.urlHash = DigestUtils.shaHex(url);
+        } else {
+            this.urlHash = "";
+        }
     }
 
     public String getText() {
@@ -117,10 +123,7 @@ public class Copi extends BaseDocument implements Serializable {
     }
 
     public String getUrlHash() {
-        return urlHash;
+        return StringUtils.isNotBlank(urlHash) ? urlHash : "";
     }
 
-    public void setUrlHash(String urlHash) {
-        this.urlHash = urlHash;
-    }
 }

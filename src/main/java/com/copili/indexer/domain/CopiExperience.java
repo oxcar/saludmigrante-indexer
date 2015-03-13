@@ -39,6 +39,7 @@ public class CopiExperience extends Copi implements Serializable {
     @Override
     public boolean isValid() {
         boolean ok = super.isValid();
+        ok = ok && StringUtils.isNotBlank(url);
         ok = ok && (type.equals(Type.EXPERIENCE));
         ok = ok && null != publishedDate;
         ok = ok && StringUtils.isNotBlank(source);
