@@ -58,6 +58,7 @@ Acepta los siguientes parametros de URL (opcionales):
 * from (integer): indica desde que registro se regresan resultados. 0 por defecto, indicando que se regresa el primer registro.
 * size (integer): indica el tamaño de pagina, el numero de registros a regresar. 10 por defecto.
 * query (string): cadena de texto para realizar busquedas
+* state (string): cadena de texto, dos caracteres, con los codigos ISO de los estados. Por defecto es "US".
 
 ### Busqueda de Copis de Learn
 
